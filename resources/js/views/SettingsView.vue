@@ -27,17 +27,17 @@
                         <!-- Кнопки -->
                         <div class="form__box">
                             <label for="password_old" class="label">Введите старый пароль</label>
-                            <input type="text" class="input" v-model.trim="form.fields.old_password" placeholder="Введите старый пароль" id="password_old">
+                            <input type="password" class="input" v-model.trim="form.fields.old_password" placeholder="Введите старый пароль" id="password_old">
                             <p>{{ errors['old_password'] }}</p>
                         </div>
                         <div class="form__box">
                             <label for="new_password" class="label">Введите новый пароль</label>
-                            <input type="text" class="input" v-model.trim="form.fields.new_password" placeholder="Введите новый пароль" id="new_password">
+                            <input type="password" class="input" v-model.trim="form.fields.new_password" placeholder="Введите новый пароль" id="new_password">
                             <p>{{ errors['new_password'] }}</p>
                         </div>
                         <div class="form__box">
                             <label for="new_password_confirmation" class="label">Повторите новый пароль</label>
-                            <input type="text" class="input" v-model.trim="form.fields.new_password_confirmation" placeholder="Повторите новый пароль" id="new_password_confirmation">
+                            <input type="password" class="input" v-model.trim="form.fields.new_password_confirmation" placeholder="Повторите новый пароль" id="new_password_confirmation">
                             <p>{{ errors['new_password_confirmation'] }}</p>
                         </div>
                         <div class="form__box">
@@ -166,7 +166,13 @@
             alertMessage.value.message = "Успешно. Пароль изменен"
             alertMessage.value.status = "success"
             alertMessage.value.clear()
+
+            // После смены пароля выйти
+            await logout()
+
             store.commit("SET_LOADER", false)
+            console.log(store.state.user)
+
         } catch (err) {
             alertMessage.value.message = "Ошибка. Пароль не изменен"
             alertMessage.value.status = "error"

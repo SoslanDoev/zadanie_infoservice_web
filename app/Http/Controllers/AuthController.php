@@ -66,7 +66,7 @@ class AuthController extends Controller
         $user->save();
 
         // Инвалидация текущих JWT токенов (по желанию)
-        auth()->logout();
+        // auth()->logout();
 
         return response()->json([
             "status" => 200,
