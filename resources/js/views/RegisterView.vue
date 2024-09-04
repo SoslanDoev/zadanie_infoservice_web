@@ -21,6 +21,7 @@
                     <div class="form__box">
                         <button @keyup.enter="register" @click.prevent="register" class="btn">Зарегистрироваться</button>
                     </div>
+                    <p v-if="errors['message']">{{ errors['message'] }}</p>
                     <!-- END Кнопки -->
                 </div>
 
@@ -31,6 +32,10 @@
 
 <script setup>
     import { ref } from "vue"
+
+    // Router на vue
+    import { useRouter } from "vue-router"
+    const router = useRouter()
     
     // Вывод ошибок
     const errors = ref({})
@@ -72,10 +77,14 @@
         try {
             const { name, email, password, password_confirmation } = forms.value.fields
             const data = await store.dispatch("register", { name, email, password, password_confirmation, })
-            console.log("qwe", data)
             // Получение если ошибка
-            if (!data.status) { errors.value = data.errors } 
-            console.log("hello world", data)
+            if (!data.status || data.status >= 400) {
+                errors.value['message'] = data.errors
+                return
+            } 
+            localStorage.setItem("token", data.data.access_token)
+            await store.dispatch("auth", { token: data.data.access_token })
+            router.push("/")
         } catch (err) {
             console.log(err)
         }

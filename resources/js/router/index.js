@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useStore } from 'vuex'; // Импорт store
+import store from "../store/index"
 
 const routes = [
     // Главная страница 
     {
         path: '/', name: 'HomeView', meta: {
-            header: true, footer: true,
+            header: true, footer: true, // Показывать шапку и подвал
             guard: "all", // Маршрут только для гостей 
         },
         component: () => import("../views/HomeView.vue")
@@ -13,7 +13,7 @@ const routes = [
     // Регистрация 
     {
         path: '/register', name: 'RegisterView', meta: {
-            header: true, footer: true,
+            header: true, footer: true, // Показывать шапку и подвал
             guard: "guest", // Маршрут только для гостей 
         },
         component: () => import("../views/RegisterView.vue")
@@ -21,7 +21,7 @@ const routes = [
     // Авторизация 
     {
         path: '/auth', name: 'AuthView', meta: {
-            header: true, footer: true,
+            header: true, footer: true, // Показывать шапку и подвал
             guard: "guest", // Маршрут только для гостей 
         },
         component: () => import("../views/AuthView.vue")
@@ -29,7 +29,8 @@ const routes = [
     //  Страница не найдена 
     {
         path: "/:pathMatch(.*)*", name: "NotFound", meta: {
-            header: true, footer: true,
+            header: true, footer: true, // Показывать шапку и подвал
+            guard: "all", // Маршрут только для гостей 
         },
         component: () => import("../views/NotFound.vue"),
     },
@@ -41,8 +42,30 @@ const router = createRouter({
 })
 
 // Middleware для проверки авторизации
-router.beforeEach((to, from, next) => {
-    next()
+router.beforeEach(async (to, from, next) => {
+    const isAuthenticated = store.state.user.isAuthenticated;
+    // Проверяем, нужно ли выполнить проверку
+    if (!localStorage.getItem("token")) {
+        next()
+    } else if (!isAuthenticated && localStorage.getItem("token")) {
+        try {
+            // Асинхронно запрашиваем данные пользователя
+            await store.dispatch("auth", { token: localStorage.getItem("token") });
+        } catch (error) {
+            // Если возникла ошибка при получении данных, можно перенаправить на страницу входа
+            return next({ name: 'AuthView' });
+        }
+    }
+
+    // Проверка защиты маршрута
+    if (to.meta.guard === "guest" && store.state.user.isAuthenticated) {
+        // Если пользователь авторизован и пытается попасть на страницу для гостей
+        return next({ name: 'HomeView' });
+    }
+
+    // Продолжить переход к маршруту
+    next();
 });
+
 
 export default router

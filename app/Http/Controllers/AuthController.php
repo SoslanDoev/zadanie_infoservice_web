@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+// Для отправки писем на почту
+use Illuminate\Support\Facades\Mail;
+
 class AuthController extends Controller
 {
     /**

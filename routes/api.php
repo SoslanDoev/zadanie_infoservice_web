@@ -1,9 +1,14 @@
 <?php
 
+use App\Http\Controllers\MailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LeedController;
+
+// подтверждение аккаунта
+use App\Http\Controllers\EmailVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,13 +29,23 @@ Route::group(["namespace" => "User", "prefix" => "users"], function() {
     Route::post("/", [StoreController::class, "index"]);
 });
 
+// Для пользователя 
 Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
-    Route::post("/login", [AuthController::class, "login"]);
-    Route::post("/logout", [AuthController::class, "logout"]);
-    Route::post("/refresh", [AuthController::class, "refresh"]);
-    Route::post("/me", [AuthController::class, "me"]);
-    // Route::post('login', 'AuthController@login');
-    // Route::post('logout', 'AuthController@logout');
-    // Route::post('refresh', 'AuthController@refresh');
-    // Route::post('me', 'AuthController@me');
+    Route::post("/login", [AuthController::class, "login"]); // Авторизация
+    Route::post("/logout", [AuthController::class, "logout"]); // Выход
+    Route::post("/refresh", [AuthController::class, "refresh"]); // Обновление ключа
+    Route::post("/me", [AuthController::class, "me"]); // Вся информация
+});
+
+Route::get('/send-mail', [MailController::class, 'send']);
+
+// Для подтверждения аккаунта
+Route::get('/verify-email/{token}', [StoreController::class, 'verify']);
+
+// Leed
+Route::group(["namespace" => "Leed", "prefix" => "leed"], function() {
+    Route::get("/", [LeedController::class, "index"]);
+    Route::post("/", [LeedController::class, "store"]);
+    Route::delete("/{id}", [LeedController::class, "destroy"]);
+    Route::patch('/{id}', [LeedController::class, 'update']);
 });

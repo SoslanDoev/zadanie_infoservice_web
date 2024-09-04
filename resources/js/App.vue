@@ -20,11 +20,6 @@
 <script setup>
     import AppHeader from "@/Components/Header/AppHeader.vue"
     import AppFooter from "@/Components/Footer/AppFooter.vue"
-    import { useStore } from "vuex"
-    // Получение пользователя если токен существует 
-    const store = useStore()
-    const token = localStorage.getItem("token")
-    if (token) { store.dispatch("auth", { token }) }
 </script>
 
 <style>
@@ -105,7 +100,7 @@
         align-items: center;
         justify-content: space-between;
     }
-    input {
+    .input, .textarea {
         width: 100%;
         padding: 5px;
         padding-left: 5px;
@@ -114,11 +109,18 @@
         margin: 5px 0;
         outline: none;
         border: none;
+        font-weight: 600;
+        font-family: inherit;
+        font-size: 0.875rem;
         background-color: var(--clr-primary);
         color: var(--clr-text);
     }
-    input::placeholder {
+    .input::placeholder {
         color: var(--clr-text);
+    }
+    .textarea {
+        resize: none;
+        height: 150px;
     }
     .btn {
         width: 100%;

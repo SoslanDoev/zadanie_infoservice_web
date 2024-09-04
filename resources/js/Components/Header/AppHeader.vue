@@ -12,14 +12,14 @@
                         <li class="header__item" v-for="item in linksList" :key="item.url">
                             <!-- Ссылка для авторизованных пользователей -->
                             <router-link 
-                                v-if="store.state.user && item.meta.auth === 'auth'"
+                                v-if="store.state.user.isAuthenticated && item.meta.auth === 'auth'"
                                 class="link header__link" 
                                 :to="item.url">{{ item.name }}
                             </router-link>
                             
                             <!-- Ссылка для гостей -->
                             <router-link 
-                                v-else-if="!store.state.user && item.meta.auth === 'guest'"
+                                v-else-if="!store.state.user.isAuthenticated && item.meta.auth === 'guest'"
                                 class="link header__link" 
                                 :to="item.url">{{ item.name }}
                             </router-link>
@@ -30,6 +30,9 @@
                                 class="link header__link" 
                                 :to="item.url">{{ item.name }}
                             </router-link>
+                        </li>
+                        <li class="header__item" v-if="store.state.user.isAuthenticated">
+                            <a class="link header__link"  href="#" @click.prevent="logout">Выход</a>
                         </li>
                     </ul>
                 </nav>
@@ -54,8 +57,11 @@
         { name: "Регистрация", url: "/register", meta: { auth: "guest", } },
         { name: "Войти", url: "/auth", meta: { auth: "guest", } },
         { name: "Пользователь", url: "/settings", meta: { auth: "auth", } },
-        { name: "Выход", url: "/logout", meta: { auth: "auth", } },
     ])
+
+    const logout = async () => {
+        await store.dispatch("logout", { token: localStorage.getItem("token") })
+    }
 </script>
 
 <style>

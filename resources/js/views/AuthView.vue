@@ -7,7 +7,7 @@
                     <!-- Шапка формы -->
                     <div class="form__header">
                         <h3 class="form__header-title">Авторизация</h3>
-                        <router-link class="link" to="/auth">Регистрация</router-link>
+                        <router-link class="link" to="/register">Регистрация</router-link>
                     </div>
                     <!-- END Шапка формы -->
 
@@ -20,6 +20,7 @@
 
                     <div class="form__box">
                         <button @keyup.enter="login" @click.prevent="login" class="btn">Войти</button>
+                        <p>{{ errors['message'] }}</p>
                     </div>
                     <!-- END Кнопки -->
                 </div>
@@ -31,6 +32,9 @@
 
 <script setup>
     import { ref } from "vue"
+    // Подключение роутов vue
+    import { useRouter } from "vue-router"
+    const router = useRouter()
     
     // Вывод ошибок
     const errors = ref({})
@@ -70,12 +74,11 @@
         try {
             const { name, email, password, password_confirmation } = forms.value.fields
             const data = await store.dispatch("login", { name, email, password, password_confirmation, })
-            console.log("qwe", data)
             // Получение если ошибка
             if (!data.status) { errors.value = data.errors; return }
             localStorage.setItem("token", data.data.access_token)
             await store.dispatch("auth", { token: data.data.access_token })
-            // const user = await store.dispatch("register", { name, email, password, password_confirmation, })
+            router.push("/")
         } catch (err) {
             console.log(err)
         }
