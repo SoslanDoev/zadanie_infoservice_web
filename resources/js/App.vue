@@ -1,5 +1,6 @@
 <template>
     <div class="wrapper">
+        <AppLoader v-if="store.state.loader" />
 
         <!-- Шапка сайта -->
         <AppHeader />
@@ -20,6 +21,9 @@
 <script setup>
     import AppHeader from "@/Components/Header/AppHeader.vue"
     import AppFooter from "@/Components/Footer/AppFooter.vue"
+    import AppLoader from "@/Components/AppLoader.vue"
+    import { useStore } from "vuex"
+    const store = useStore()
 </script>
 
 <style>

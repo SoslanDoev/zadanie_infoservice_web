@@ -16,12 +16,12 @@ class LeedController extends Controller
     public function update(Request $req, $id) {
         $data = Leed::find($id);
         if (!$data)
-          return response(["status" => 400, "message" => "Запись не найдена"]);
+          return response(["status" => 400, "message" => "Ошибка. Запись не найдена"]);
         $validator = Validator::make($req->all(), [
             'status' => 'required|min:2|max:50',
         ]);
         if ($validator->fails())
-            return response()->json($validator->errors());
+            return response(["status" => 400, "errors" => $validator->errors(), "message" => "Ошибка. Запись не обновлена"]);
         $result = $data->update($req->all());
         return $result;
     }
@@ -48,6 +48,8 @@ class LeedController extends Controller
         return $data;
     }
 
+    // Функция удаления записи
+    // Входные параметры: $id - идентификатор лида
     public function destroy($id) {
         $data = Leed::find($id);
         if (!$data)

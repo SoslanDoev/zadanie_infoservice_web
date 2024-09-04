@@ -2,7 +2,6 @@
     <div class="register">
         <div class="container">
             <div class="register__inner">
-
                 <div class="form">
                     <!-- Шапка формы -->
                     <div class="form__header">
@@ -42,8 +41,6 @@
 
     // Глобальное хранилище
     import { useStore } from "vuex"
-    
-    // Глобальное хранилище
     const store = useStore()
     
     const createForm = () => {
@@ -73,19 +70,31 @@
             *   - status: boolean - Статус регистрации (true - успешно, false - ошибка)
             *   - errors: Object - Объект с ошибками, если статус false
         */
+        store.commit("SET_LOADER", true)
         errors.value = {}
         try {
             const { name, email, password, password_confirmation } = forms.value.fields
             const data = await store.dispatch("register", { name, email, password, password_confirmation, })
             // Получение если ошибка
+            console.log(data)
             if (!data.status || data.status >= 400) {
-                errors.value['message'] = data.errors
+                if (typeof(data.errors) === "string") {
+                    errors.value['message'] = data.errors
+                    console.log('da')
+                } else if (typeof(data.errors) === "object") {
+                    for (const err in data.errors) {
+                        errors.value[err] = data.errors[err]
+                    }
+                }
+                store.commit("SET_LOADER", false)
                 return
             } 
             localStorage.setItem("token", data.data.access_token)
             await store.dispatch("auth", { token: data.data.access_token })
             router.push("/")
+            store.commit("SET_LOADER", false)
         } catch (err) {
+            store.commit("SET_LOADER", false)
             console.log(err)
         }
     }

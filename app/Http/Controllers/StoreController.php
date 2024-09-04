@@ -19,7 +19,7 @@ class StoreController extends Controller
         // Проверка на наличие пользователя с данным email
         $existingUser = User::where("email", $data["email"])->first();
         if ($existingUser) {
-            return response(["status" => 400, "message" => "Такой пользователь уже существует"]);
+            return response(["status" => 400, "message" => "Ошибка. Пользователь уже существует"]);
         }
 
         // Создание токена для подтверждения email

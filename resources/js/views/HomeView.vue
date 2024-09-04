@@ -4,6 +4,9 @@
     <div class="home">
         <div class="container">
             <div class="home__inner">
+                <AppAlert v-if="alertMessage.status === 'success'" :message="alertMessage.message" type="success" />
+                <AppAlert v-if="alertMessage.status === 'error'" :message="alertMessage.message" type="error" />
+                <AppAlert v-if="alertMessage.status === 'warning'" :message="alertMessage.message" type="warning" />
 
                 <!-- Блок подтверждения удаления записи, отображается только при включении destroyEnabled -->
                 <div class="home__update" v-if="destroyEnabled">
@@ -22,7 +25,7 @@
                     </div>
                     <!-- Шапка формы -->
                     <div class="form__header">
-                        <h3 class="form__header-title">Заявка</h3>
+                        <h2 class="form__header-title">Заявки</h2>
                     </div>
                     <!-- END Шапка формы -->
                     <!-- Кнопки -->
@@ -110,10 +113,24 @@
 </template>
 
 <script setup>
+    import AppAlert from "@/Components/AppAlert.vue"
+    const alertMessage = ref({
+        message: "",
+        status: "", // success, error, warning
+        clear: (() => {
+            setTimeout(() => {
+                alertMessage.value.message = null
+                alertMessage.value.status = null
+            }, 2000);
+        }),
+    })
+
     // Импорт необходимых функций Vue.js и зависимостей
     import { ref, onMounted } from "vue"
     import { useStore } from "vuex"
     import axios from "axios"
+    // Валидация
+    import { isValidEmail } from "@/helper/validation"
 
     // Использование Vuex для хранения данных пользователя
     const store = useStore()
@@ -161,21 +178,32 @@
         return new Date(dateString).toLocaleDateString('ru-RU', options)
     }
 
+    // Функция удаления лида
     const destroy = async (id) => {
         try {
             const data = await axios.delete(`/api/leed/${id}`)
             if (data.data.status >= 400) {
+                // Сообщение
+                alertMessage.value.message = "Ошибка. Запись не удалена"
+                alertMessage.value.status = "error"
+                alertMessage.value.clear()
                 errors['message'] = data.data.message
                 return 
             }
             leedList.value = leedList.value.filter((e) => e.id !== id)
             destroyEnabled.value = false
             destroyIndex.value = null
+            
+            // Сообщение
+            alertMessage.value.message = "Запись успешно удалена"
+            alertMessage.value.status = "success"
+            alertMessage.value.clear()
         } catch (err) {
             console.log(err)
         }
     }
 
+    // Функция получения лида
     const getLeed = async () => {
         try {
             const leedData = await axios.get("/api/leed")
@@ -205,29 +233,78 @@
         destroyIndex.value = id
    } 
     
+    //  Функция обновления лида
     const leedUpdate = async (id) => {
         try {
-            await axios.patch(`/api/leed/${id}`, { status: checkUpdate.value.data.status })
+            const data = await axios.patch(`/api/leed/${id}`, { status: checkUpdate.value.data.status })
+            if (data.data.status >= 400) {
+                // Сообщение
+                alertMessage.value.message = "Ошибка. Запись не обновлена"
+                alertMessage.value.status = "error"
+                alertMessage.value.clear()
+                return
+            }
+            // Сообщение
+            alertMessage.value.message = "Успешно. Запись обновлена"
+            alertMessage.value.status = "success"
+            alertMessage.value.clear()
         } catch (err) {
-            console.log(err)
-        }
+            // Сообщение
+            alertMessage.value.message = "Ошибка. Запись не обновлена"
+            alertMessage.value.status = "error"
+            alertMessage.value.clear()
+        } 
     }
 
+    // Добавление заявки
     const leedSubmit = async () => {
-        console.log("yes")
         try {
+            errors.value = {}
             const { name, surname, phone, email, text } = forms.value.fields
+            // Проверка на ошибки
+            if (!name || name.length < 3) { errors.value["name"] =  "Имя должно содержать более 3 символов" }
+            else if (name.length >= 50) { errors.value["name"] =  "Имя должно содержать менее 50 символов" }
+            
+            if (!surname || surname.length < 3) { errors.value["surname"] =  "Фамилия должна содержать более 3 символов" }
+            else if (surname.length >= 50) { errors.value["surname"] =  "Фамилия должна содержать менее 50 символов" }
+            
+            if (!email || email.length < 3) { errors.value["email"] =  "Почта должна содержать более 3 символов" }
+            else if (email.length >= 50) { errors.value["email"] =  "Почта должна содержать менее 50 символов" }
+            else if (!isValidEmail(email)) { errors.value["email"] = "Почта не соответствует действительности" }
+
+            if (!text || text.length < 3) { errors.value["text"] =  "Текст должен содержать более 3 символов" }
+            else if (text.length >= 10000) { errors.value["text"] =  "Текст должен содержать менее 10000 символов" }
+
+            if (Object.keys(errors.value).length > 0) { 
+                // Сообщение
+                alertMessage.value.message = "Ошибка. Заполните поля"
+                alertMessage.value.status = "error"
+                alertMessage.value.clear()
+                return
+            }
+
             const data = await axios.post("/api/leed", { name, surname, phone, email, text })
             errors.value = {}
-            console.log(data)
-            if (data.data.errors) {
+            if (data.data.errors || data.data.status >= 400) {
                 const errorsData = data.data.errors
                 for (const err in errorsData) {
                     errors.value[err] = errorsData[err][0] || errorsData[err] 
                 }
+                // Сообщение
+                alertMessage.value.message = "Ошибка. Запись не добавлена"
+                alertMessage.value.status = "error"
+                alertMessage.value.clear()
                 return 
             }
+            // Сообщение
+            alertMessage.value.message = "Успешно. Заявка отправлена"
+            alertMessage.value.status = "success"
+            alertMessage.value.clear()
         } catch (err) {
+            // Сообщение
+            alertMessage.value.message = "Ошибка. Запись не добавлена"
+            alertMessage.value.status = "error"
+            alertMessage.value.clear()
             console.log(err)
         }
     }

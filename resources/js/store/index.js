@@ -6,6 +6,7 @@ import { isValidEmail } from "@/helper/validation"
 
 export default createStore({
   state: {
+    loader: false, // Экран загрузки false - ВЫКЛ true - ВКЛ
     // Состояние пользователя
     user: { 
         isAuthenticated: false, // Флаг состояния авторизации (true - авторизован, false - не авторизован)
@@ -15,6 +16,10 @@ export default createStore({
   getters: {
   },
   mutations: {
+    // Функция для запуска загрузки
+    SET_LOADER(state, enabled) {
+        state.loader = enabled
+    },
     SET_USER(state, { user, isAuth }) {
         /**
          * Мутация для обновления состояния пользователя в Vuex.

@@ -41,8 +41,6 @@
 
     // Глобальное хранилище
     import { useStore } from "vuex"
-    
-    // Глобальное хранилище
     const store = useStore()
     
     const createForm = () => {
@@ -70,16 +68,23 @@
             *   - status: boolean - Статус регистрации (true - успешно, false - ошибка)
             *   - errors: Object - Объект с ошибками, если статус false
         */
-        errors.value = {}
+       errors.value = {}
+       store.commit("SET_LOADER", true)
         try {
             const { name, email, password, password_confirmation } = forms.value.fields
             const data = await store.dispatch("login", { name, email, password, password_confirmation, })
             // Получение если ошибка
-            if (!data.status) { errors.value = data.errors; return }
+            if (!data.status) {
+                errors.value = data.errors
+               store.commit("SET_LOADER", false)
+                return
+            }
             localStorage.setItem("token", data.data.access_token)
             await store.dispatch("auth", { token: data.data.access_token })
+            store.commit("SET_LOADER", false)
             router.push("/")
         } catch (err) {
+            store.commit("SET_LOADER", false)
             console.log(err)
         }
     }

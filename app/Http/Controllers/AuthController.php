@@ -54,11 +54,10 @@ class AuthController extends Controller
             "new_password_confirmation" => "required|min:3"
         ]);
         if ($validator->fails())
-            return response()->json($validator->errors());
-
+            return response(["status" => 400, "errors" => $validator->errors(), "message" => "Ошибка. Валидация не прошла"]);
         // Проверка старого пароля
         if (!Hash::check($request->old_password, auth()->user()->password)) {
-            return "Пароли не совпадают";
+            return response(["status" => 400, "errors" => "Ошибка. Проверьте правильность паролей"]);
         }
 
         // Обновление пароля
