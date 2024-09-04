@@ -44,6 +44,9 @@
 
         /* Анимация */
         --transition-default: all 200ms linear;
+
+        /* Граница */
+        --border-radius-default: 4px;
     }
     html, body {
         height: 100%;

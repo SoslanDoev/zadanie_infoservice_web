@@ -1,5 +1,5 @@
 <template>
-    <router-link class="logo" to="/">Логотип</router-link>
+    <router-link class="logo" to="/">Заявки</router-link>
 </template>
 
 <style>

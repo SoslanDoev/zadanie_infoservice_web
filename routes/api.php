@@ -35,11 +35,13 @@ Route::group(['middleware' => 'api','prefix' => 'auth'], function ($router) {
     Route::post("/logout", [AuthController::class, "logout"]); // Выход
     Route::post("/refresh", [AuthController::class, "refresh"]); // Обновление ключа
     Route::post("/me", [AuthController::class, "me"]); // Вся информация
+    Route::post("/password_change", [AuthController::class, "changePassword"]); // Смена пароля
 });
 
 Route::get('/send-mail', [MailController::class, 'send']);
 
 // Для подтверждения аккаунта
+Route::get('/verify-email-message/{id}', [StoreController::class, 'verifyMessage']);
 Route::get('/verify-email/{token}', [StoreController::class, 'verify']);
 
 // Leed

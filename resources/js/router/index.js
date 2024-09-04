@@ -26,6 +26,14 @@ const routes = [
         },
         component: () => import("../views/AuthView.vue")
     },
+    // Пользователь 
+    {
+        path: '/settings', name: 'SettingsView', meta: {
+            header: true, footer: true, // Показывать шапку и подвал
+            guard: "auth", // Маршрут только для гостей 
+        },
+        component: () => import("../views/SettingsView.vue")
+    },
     //  Страница не найдена 
     {
         path: "/:pathMatch(.*)*", name: "NotFound", meta: {
@@ -45,14 +53,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     const isAuthenticated = store.state.user.isAuthenticated;
     // Проверяем, нужно ли выполнить проверку
-    if (!localStorage.getItem("token")) {
-        next()
-    } else if (!isAuthenticated && localStorage.getItem("token")) {
+    if (!isAuthenticated && localStorage.getItem("token")) {
         try {
             // Асинхронно запрашиваем данные пользователя
             await store.dispatch("auth", { token: localStorage.getItem("token") });
         } catch (error) {
             // Если возникла ошибка при получении данных, можно перенаправить на страницу входа
+            localStorage.removeItem("token")
             return next({ name: 'AuthView' });
         }
     }
@@ -62,6 +69,12 @@ router.beforeEach(async (to, from, next) => {
         // Если пользователь авторизован и пытается попасть на страницу для гостей
         return next({ name: 'HomeView' });
     }
+
+    if (to.meta.guard === "auth" && !store.state.user.isAuthenticated) {
+            // Если пользователь не авторизован и пытается попасть на страницу для авторизованных
+            return next({ name: 'HomeView' });
+    }
+
 
     // Продолжить переход к маршруту
     next();

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 // Для отправки писем на почту
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -43,6 +45,34 @@ class AuthController extends Controller
     public function me()
     {
         return response()->json(auth()->user());
+    }
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required',
+            'new_password' => 'required|min:3|confirmed',
+            "new_password_confirmation" => "required|min:3"
+        ]);
+        if ($validator->fails())
+            return response()->json($validator->errors());
+
+        // Проверка старого пароля
+        if (!Hash::check($request->old_password, auth()->user()->password)) {
+            return "Пароли не совпадают";
+        }
+
+        // Обновление пароля
+        $user = auth()->user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        // Инвалидация текущих JWT токенов (по желанию)
+        auth()->logout();
+
+        return response()->json([
+            "status" => 200,
+            'message' => 'Пароль успешно изменен',
+        ]);
     }
 
     /**

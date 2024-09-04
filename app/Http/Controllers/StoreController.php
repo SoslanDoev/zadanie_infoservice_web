@@ -37,6 +37,15 @@ class StoreController extends Controller
         return response(["access_token" => $token], 201);
     }
 
+    public function verifyMessage ($id) {
+        $user = User::find($id);
+        if (!$user)
+            return response(["status" => 400, "message" => "Пользователь не найден"]);
+        // Отправка письма с подтверждением
+        Mail::to($user["email"])->send(new AccountConfirmationMail($user, $user['verification_token']));
+        return response(["status" => 200, "message" => "Сообщение отправлено на почту"]);
+    }
+
     public function verify($token)
     {
         // Поиск пользователя по токену

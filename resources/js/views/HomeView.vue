@@ -4,15 +4,17 @@
     <div class="home">
         <div class="container">
             <div class="home__inner">
-                {{ destroyIndex }}
 
+                <!-- Блок подтверждения удаления записи, отображается только при включении destroyEnabled -->
                 <div class="home__update" v-if="destroyEnabled">
+                    <h2 class="home__update-delete--title">Удалить запись ?</h2>
                     <div class="home__delete-header">
-                        <button class="btn" @click="delete(destroyIndex)">Удалить</button>
+                        <button class="btn" @click="destroy(destroyIndex)">Удалить</button>
                         <button class="btn" @click="destroyEnabled = false">Отмена</button>
                     </div>
                 </div>
                 
+                <!-- Блок обновления записи, отображается при enabled в checkUpdate -->
                 <div class="home__update" v-if="checkUpdate.enabled">
                     <div class="home__update-header">
                         <h2>Обновить {{ checkUpdate.data.email }} - {{ checkUpdate.data.id }}</h2>
@@ -47,9 +49,9 @@
                     <!-- END Кнопки -->
                 </div>
 
+                <!-- Если пользователь авторизован, отображается список лидов -->
                 <div v-if="store.state.user.isAuthenticated">
-                    <h1>Список лидов</h1>
-                    <p v-if="leedList">Кол-во: {{ leedList.length }}</p>
+                    <h2>Список лидов. <span v-if="leedList">Кол-во: {{ leedList.length }}</span></h2>
                     <table>
                     <thead>
                         <tr>
@@ -81,7 +83,7 @@
                     </table>
                 </div>
 
-
+                <!-- Если пользователь не авторизован, отображается форма создания заявки -->
                 <div class="form home__form" v-else>
                     <!-- Шапка формы -->
                     <div class="form__header">
@@ -108,13 +110,16 @@
 </template>
 
 <script setup>
+    // Импорт необходимых функций Vue.js и зависимостей
     import { ref, onMounted } from "vue"
     import { useStore } from "vuex"
     import axios from "axios"
+
+    // Использование Vuex для хранения данных пользователя
     const store = useStore()
 
     
-    // Вывод ошибок
+    // Объект для хранения ошибок валидации
     const errors = ref({})
 
     // Список лидов
@@ -129,12 +134,6 @@
 
     const destroyEnabled = ref(false)
     const destroyIndex = ref(null)
-
-    const checkUpdateActive = ({ id, item }) => {
-        checkUpdate.value.enabled = true
-        checkUpdate.value.id = id
-        checkUpdate.value.data = item
-    }
 
     const createForm = () => {
         /*
@@ -170,6 +169,8 @@
                 return 
             }
             leedList.value = leedList.value.filter((e) => e.id !== id)
+            destroyEnabled.value = false
+            destroyIndex.value = null
         } catch (err) {
             console.log(err)
         }
@@ -185,10 +186,23 @@
         }
     }
 
+    const checkUpdateActive = ({ id, item }) => {
+        destroyEnabled.value =  false
+        destroyIndex.value = null
+
+        checkUpdate.value.enabled = true
+        checkUpdate.value.id = id
+        checkUpdate.value.data = item
+    }
+
+
    const destroyPre = (id) => {
+        checkUpdate.value.enabled = false
+        checkUpdate.value.id = null
+        checkUpdate.value.data = null
+
         destroyEnabled.value =  true
         destroyIndex.value = id
-        console.log(destroyIndex.value)
    } 
     
     const leedUpdate = async (id) => {
@@ -238,6 +252,7 @@
         max-width: 500px;
         width: 100%;
         transform: translate(-50%, -50%);
+        border-radius: var(--border-radius-default);
     }
     .home__update-header {
         display: flex;
@@ -248,19 +263,21 @@
     .home__update-header .btn {
         width: 100px;
     }
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th, td {
-  padding: 10px;
-  border: 1px solid var(--clr-primary);
-  text-align: left;
-  background-color: var(--clr-secondary);
-}
-
-th {
-  background-color: var(--clr-secondary);
-}
+    .home__update-delete--title {
+        text-align: center;
+        margin: 0 0 5px;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 10px;
+        border: 1px solid var(--clr-primary);
+        text-align: left;
+        background-color: var(--clr-secondary);
+    }
+    th {
+        background-color: var(--clr-secondary);
+    }
 </style>

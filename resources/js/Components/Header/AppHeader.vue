@@ -48,6 +48,9 @@
     import AppLogo from "@/Components/AppLogo.vue"
     import { ref } from "vue"
 
+    import { useRouter } from "vue-router"
+    const router = useRouter()
+
     import { useStore } from "vuex"
     const store = useStore()
 
@@ -61,6 +64,7 @@
 
     const logout = async () => {
         await store.dispatch("logout", { token: localStorage.getItem("token") })
+        router.push("/")
     }
 </script>
 
