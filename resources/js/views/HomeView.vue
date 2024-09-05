@@ -7,7 +7,6 @@
                 <AppAlert v-if="alertMessage.status === 'success'" :message="alertMessage.message" type="success" />
                 <AppAlert v-if="alertMessage.status === 'error'" :message="alertMessage.message" type="error" />
                 <AppAlert v-if="alertMessage.status === 'warning'" :message="alertMessage.message" type="warning" />
-
                 <!-- Блок подтверждения удаления записи, отображается только при включении destroyEnabled -->
                 <div class="home__update" v-if="destroyEnabled">
                     <h2 class="home__update-delete--title">Удалить запись ?</h2>
@@ -31,11 +30,11 @@
                     <!-- Кнопки -->
 
                     <div class="form__box">
-                        <label for="status" class="label">Статус</label>
-                        <select class="input" v-model="checkUpdate.data.status" name="status" id="status">
-                            <option value="Новый">Новый</option>
-                            <option value="В работе">В работе</option>
-                            <option value="Завершен">Завершен</option>
+                        <label for="status_id" class="label">Статус</label>
+                        <select class="input" v-model="checkUpdate.data.status_id" name="status_id" id="status_id">
+                            <option value="1" selected>Новый</option>
+                            <option value="2">В работе</option>
+                            <option value="3">Завершен</option>
                         </select>
                     </div>
                      
@@ -77,7 +76,7 @@
                         <td>{{ lead.email }}</td>
                         <td>{{ lead.text }}</td>
 
-                        <td>{{ lead.status }}</td>
+                        <td>{{ lead.status_name }}</td>
 
                         <td>{{ formatDate(lead.created_at) }}</td>
                         <td><button class="btn" @click.stop="destroyPre(lead.id)">Удалить</button></td>
@@ -160,7 +159,7 @@
             *   - inputs: Array - Массив кнопок
         */
         // Значения кнопок
-        const fields = { name: "", surname: "", phone: "", email: "", text: "", status: ""};
+        const fields = { name: "", surname: "", phone: "", email: "", text: "", status_id: ""};
         // Для создания кнопок
         const inputs = [
             { placeholder: "Введите имя", value: () => forms.value.fields.name, type: "text", id: "name" },
@@ -207,7 +206,7 @@
     const getLeed = async () => {
         try {
             const leedData = await axios.get("/api/leed")
-            leedList.value = leedData.data
+            leedList.value = leedData.data.data
             console.log(leedData)
         } catch (err) {
             console.log(err)
@@ -236,7 +235,7 @@
     //  Функция обновления лида
     const leedUpdate = async (id) => {
         try {
-            const data = await axios.patch(`/api/leed/${id}`, { status: checkUpdate.value.data.status })
+            const data = await axios.patch(`/api/leed/${id}`, { status_id: checkUpdate.value.data.status_id })
             if (data.data.status >= 400) {
                 // Сообщение
                 alertMessage.value.message = "Ошибка. Запись не обновлена"
@@ -248,6 +247,14 @@
             alertMessage.value.message = "Успешно. Запись обновлена"
             alertMessage.value.status = "success"
             alertMessage.value.clear()
+
+            const findIndex = leedList.value.findIndex((e) => e.id === id)
+            if (findIndex !== -1) {
+                const status_id = Number(checkUpdate.value.data.status_id)
+                checkUpdate.value.data.status_name = (status_id === 1) ? "Новый" : (status_id === 2) ? "В работе" : (status_id === 3) ? "Завершен" : -1
+                leedList.value[findIndex].status_name = checkUpdate.value.data.status_name
+            }
+            // leedList.value[findIndex].status_name = (id === 1) ? "Новый" : (id === 2) ? "В работе" : "Завершен"
         } catch (err) {
             // Сообщение
             alertMessage.value.message = "Ошибка. Запись не обновлена"

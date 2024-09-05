@@ -16,6 +16,12 @@ class Leed extends Model
         'phone',
         'email',
         'text',
-        "status",
+        "status_id",
     ];
+
+    // Связь с моделью Status
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
+    }
 }

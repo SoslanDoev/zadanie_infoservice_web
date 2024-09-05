@@ -5,20 +5,23 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Leed;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\LeedResource;
 
 class LeedController extends Controller
 {
     public function index() {
-        $data = Leed::all();
-        return response()->json($data);
+        return LeedResource::collection(Leed::all());
+        // $data = Leed::all();
+        // return response()->json($data);
     }
 
     public function update(Request $req, $id) {
+        // return $req . $id;
         $data = Leed::find($id);
         if (!$data)
           return response(["status" => 400, "message" => "Ошибка. Запись не найдена"]);
         $validator = Validator::make($req->all(), [
-            'status' => 'required|min:2|max:50',
+            'status_id' => 'required|exists:status,id',
         ]);
         if ($validator->fails())
             return response(["status" => 400, "errors" => $validator->errors(), "message" => "Ошибка. Запись не обновлена"]);

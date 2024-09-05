@@ -20,7 +20,11 @@ return new class extends Migration
             $table->string("phone");
             $table->string("email");
             $table->text("text");
-            $table->string("status")->default("Новый");
+            // $table->string("status")->default("Новый");
+
+            // Добавляем внешний ключ на таблицу status
+            $table->foreignId('status_id')->default(1)->constrained('status')->onDelete('cascade');
+            
             $table->timestamps();
         });
     }
