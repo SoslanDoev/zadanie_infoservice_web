@@ -2,8 +2,8 @@
 Это проект на базе Laravel и Vue.js
 
 Установка зависимостей
-npm install
-composer install
+<p>npm install</p>
+<p>composer install</p>
 
 Скопируйте файл .env.example в .env:
 copy .env.example .env  # Windows
