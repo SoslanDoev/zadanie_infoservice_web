@@ -46,6 +46,19 @@ class AuthController extends Controller
     {
         return response()->json(auth()->user());
     }
+
+    
+    /*
+        Функция для смены пароля
+        Входные параметры:
+            -> old_password - старый пароль;
+            -> new_password - новый пароль;
+            -> new_password_confirmation - новый пароль для повтора;
+        Выход: 
+            -> status -> Код запроса;
+            -> message -> Сообщение;
+            -> errors -> Ошибки если есь;
+    */
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [

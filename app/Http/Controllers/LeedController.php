@@ -9,12 +9,28 @@ use App\Http\Resources\LeedResource;
 
 class LeedController extends Controller
 {
+    /*
+        Функция для получения лидов
+        Входные параметры:
+            -> null;
+        Выход: 
+            -> Коллекция объектов LeedResource, содержащая все записи лидов из таблицы Leed. 
+    */
     public function index() {
         return LeedResource::collection(Leed::all());
-        // $data = Leed::all();
-        // return response()->json($data);
     }
 
+    /*
+        Функция для обновления информации о лиде
+        Входные параметры:
+            -> Request $req; // Объект запроса, содержащий данные для обновления.
+            -> int $id;      // Идентификатор лида, который необходимо обновить.
+        Выход:
+            -> JSON-ответ с информацией о статусе операции.
+            Если запись не найдена, возвращает сообщение об ошибке.
+            Если валидация данных не прошла, возвращает ошибки валидации.
+            В противном случае, возвращает результат обновления записи.
+    */
     public function update(Request $req, $id) {
         // return $req . $id;
         $data = Leed::find($id);
@@ -29,6 +45,16 @@ class LeedController extends Controller
         return $result;
     }
 
+    /*
+        Функция для создания нового лида в базе данных.
+        Входные параметры:
+            -> Request $req; // Объект запроса, содержащий данные для создания нового лида.
+        Выход:
+            -> JSON-ответ с информацией о статусе операции.
+            Если валидация данных не прошла, возвращает ошибки валидации.
+            Если запись не была успешно добавлена, возвращает сообщение об ошибке.
+            В противном случае, возвращает созданный объект лида.
+    */
     public function store(Request $req) {
         $validator = Validator::make($req->all(), [
             'name' => 'required|string|min:2|max:50',
@@ -51,8 +77,14 @@ class LeedController extends Controller
         return $data;
     }
 
-    // Функция удаления записи
-    // Входные параметры: $id - идентификатор лида
+    /*
+        Функция удаления определенного лида
+        Входные параметры:
+            -> id - Идентификатор лида;
+        Выход: 
+            -> status - Код запроса
+            -> message - Сообщение
+    */
     public function destroy($id) {
         $data = Leed::find($id);
         if (!$data)

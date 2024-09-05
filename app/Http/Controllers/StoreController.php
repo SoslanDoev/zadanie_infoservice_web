@@ -12,6 +12,15 @@ use App\Mail\AccountConfirmationMail;
 
 class StoreController extends Controller
 {
+    /*
+     * Функция регистрации нового пользователя с отправкой сообщения на почту
+     * Входные параметры: 
+     *  -> $req - Объект данных 
+     * Выход: 
+     *  -> status - Код статуса
+     *  -> message - Сообщение 
+     *  -> access_token - jwt токен пользователя 
+     */
     public function index(StoreRequest $req) {
         $data = $req->validated();
         $data["password"] = Hash::make($data["password"]);
@@ -37,6 +46,14 @@ class StoreController extends Controller
         return response(["access_token" => $token], 201);
     }
 
+    /*
+     * Функция отправки сообщения на почту
+     * Входные параметры: 
+     *  -> $id - Идентификатор пользователя для получения почты 
+     * Выход: 
+     *  -> status - Код статуса
+     *  -> message - Сообщение 
+     */
     public function verifyMessage ($id) {
         $user = User::find($id);
         if (!$user)
@@ -46,6 +63,14 @@ class StoreController extends Controller
         return response(["status" => 200, "message" => "Сообщение отправлено на почту"]);
     }
 
+    /*
+     * Функция подтверждения почты
+     * Входные параметры: 
+     *  -> $id - Идентификатор пользователя для получения почты 
+     * Выход: 
+     *  -> status - Код статуса
+     *  -> message - Сообщение 
+    */
     public function verify($token)
     {
         // Поиск пользователя по токену
