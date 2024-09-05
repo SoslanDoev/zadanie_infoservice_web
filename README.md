@@ -2,38 +2,38 @@
 Это проект на базе Laravel и Vue.js
 
 Установка зависимостей
-npm install
-composer install
+<p>npm install</p>
+<p>composer install</p>
 
 Скопируйте файл .env.example в .env:
-copy .env.example .env  # Windows
-cp .env.example .env  # Linux/MacOS
+<p>copy .env.example .env  # Windows</p>
+<p>cp .env.example .env  # Linux/MacOS</p>
 
 Сгенерируйте ключ приложения:
-php artisan key:generate
+<p>php artisan key:generate</p>
 
 Также сгенерируйте секрет для JWT аутентификации:
-php artisan jwt:secret
+<p>php artisan jwt:secret</p>
 
 Для работы с БД
 Измените значения на свои данные:
 
-DB_DATABASE — имя созданной базы данных
-DB_USERNAME — имя пользователя базы данных
-DB_PASSWORD — пароль для этого пользователя
+<p>DB_DATABASE — имя созданной базы данных</p>
+<p>DB_USERNAME — имя пользователя базы данных</p>
+<p>DB_PASSWORD — пароль для этого пользователя</p>
 
 После этого выполните миграции для создания необходимых таблиц:
-php artisan migrate
+<p>php artisan migrate</p>
 
 Необходимо заполнить базу данных начальными данными, выполните сидер:
-php artisan db:seed --class=StatusTableSeeder
+<p>php artisan db:seed --class=StatusTableSeeder</p>
 
 Запуск локального сервера
-php artisan serve
+<p>php artisan serve</p>
 
 Запуск сборки фронтенда
-npm run dev
+<p>npm run dev</p>
 
-SMTP (Mail.ru) - уже настроен по умолчанию
+<p>SMTP (Mail.ru) - уже настроен по умолчанию</p>
 
 Теперь проект должен быть запущен локально на вашем устройстве! http://127.0.0.1:8000/
